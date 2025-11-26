@@ -14,6 +14,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           scope: "read:user user:email repo",
         },
       },
+      allowDangerousEmailAccountLinking: true,
       profile(profile) {
         return {
           id: String(profile.id),
