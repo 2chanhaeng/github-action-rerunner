@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ExternalLinkIcon } from "@/components/ExternalLinkIcon";
 
 interface OwnerViewProps {
   repository: {
@@ -145,12 +146,48 @@ export function OwnerView({ repository }: OwnerViewProps) {
           GitHub 토큰{" "}
           {hasToken && <span className="text-green-500 text-sm">(등록됨)</span>}
         </h2>
-        <p className="text-gray-600 mb-4">
-          레포지토리에 대한{" "}
-          <code className="bg-gray-100 px-1 rounded">repo</code> 및{" "}
-          <code className="bg-gray-100 px-1 rounded">workflow</code> 권한이 있는
-          Personal Access Token을 등록하세요.
-        </p>
+
+        <details className="bg-blue-50 border border-blue-200 rounded-lg mb-4">
+          <summary className="px-4 py-3 cursor-pointer text-sm font-semibold text-blue-800 hover:bg-blue-100 rounded-lg">
+            📋 토큰 생성 방법
+          </summary>
+          <ol className="px-4 pb-4 text-sm text-blue-700 space-y-1 list-decimal list-inside">
+            <li>
+              <a
+                href="https://github.com/settings/personal-access-tokens/new"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-blue-900"
+              >
+                GitHub Personal Access Token 생성 페이지
+                <ExternalLinkIcon
+                  href="https://github.com/settings/personal-access-tokens/new"
+                  className="inline-block ml-1 align-text-bottom"
+                />
+              </a>
+              로 이동하세요.
+            </li>
+            <li>
+              <strong>Repository access</strong>에서{" "}
+              <code className="bg-blue-100 px-1 rounded">
+                Only select repositories
+              </code>
+              를 선택하고{" "}
+              <code className="bg-blue-100 px-1 rounded">
+                {repository.fullName}
+              </code>
+              을 선택하세요.
+            </li>
+            <li>
+              <strong>Permissions</strong>에서 <strong>Add permissions</strong>{" "}
+              를 선택해{" "}
+              <code className="bg-blue-100 px-1 rounded">Actions</code>
+              권한을 추가하세요.
+            </li>
+            <li>토큰을 생성하고 아래에 붙여넣으세요.</li>
+          </ol>
+        </details>
+
         <div className="flex gap-2">
           <input
             type="password"
@@ -159,7 +196,7 @@ export function OwnerView({ repository }: OwnerViewProps) {
             placeholder={
               hasToken
                 ? "새 토큰으로 변경하려면 입력하세요"
-                : "ghp_xxxxxxxxxxxx"
+                : "github_pat_xxxxxxxxxxxx"
             }
             className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
