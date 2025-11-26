@@ -14,7 +14,7 @@ export default async function RepositoryPage({ params }: PageProps) {
   const { slug } = await params;
 
   if (!session) {
-    redirect("/");
+    redirect(`/api/auth/signin?callbackUrl=/r/${slug}`);
   }
 
   const repository = await prisma.repository.findUnique({

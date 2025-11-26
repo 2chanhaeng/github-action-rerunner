@@ -2,7 +2,11 @@
 
 import { signIn, signOut, useSession } from "next-auth/react";
 
-export function LoginButton() {
+interface LoginButtonProps {
+  callbackUrl?: string;
+}
+
+export function LoginButton({ callbackUrl }: LoginButtonProps) {
   const { data: session, status } = useSession();
 
   if (status === "loading") {
@@ -31,7 +35,7 @@ export function LoginButton() {
 
   return (
     <button
-      onClick={() => signIn("github")}
+      onClick={() => signIn("github", { callbackUrl: callbackUrl || "/" })}
       className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2"
     >
       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
