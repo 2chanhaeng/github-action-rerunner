@@ -4,13 +4,13 @@ export function createOctokit(token: string) {
   return new Octokit({ auth: token });
 }
 
-// 사용자의 레포지토리 목록 조회
+// 사용자의 레포지토리 목록 조회 (개인 + 조직)
 export async function getUserRepositories(token: string) {
   const octokit = createOctokit(token);
   const { data } = await octokit.rest.repos.listForAuthenticatedUser({
     sort: "updated",
     per_page: 100,
-    affiliation: "owner",
+    affiliation: "owner,organization_member",
   });
   return data;
 }

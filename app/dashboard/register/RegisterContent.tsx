@@ -12,6 +12,112 @@ interface GitHubRepo {
   isRegistered: boolean;
 }
 
+function RepoItem({
+  repo,
+  registering,
+  onRegister,
+  showFullName = false,
+}: {
+  repo: GitHubRepo;
+  registering: number | null;
+  onRegister: (repo: GitHubRepo) => void;
+  showFullName?: boolean;
+}) {
+  return (
+    <div className="p-4 flex justify-between items-center hover:bg-gray-50">
+      <div>
+        <div className="flex items-center gap-2">
+          <h3 className="font-semibold text-gray-900">
+            {showFullName ? repo.fullName : repo.name}
+          </h3>
+          {repo.private && (
+            <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
+              Private
+            </span>
+          )}
+        </div>
+        {repo.description && (
+          <p className="text-sm text-gray-500 mt-1">{repo.description}</p>
+        )}
+      </div>
+      <button
+        onClick={() => onRegister(repo)}
+        disabled={repo.isRegistered || registering === repo.id}
+        className={`px-4 py-2 rounded-lg transition-colors ${
+          repo.isRegistered
+            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+            : registering === repo.id
+            ? "bg-blue-400 text-white cursor-wait"
+            : "bg-blue-600 text-white hover:bg-blue-700"
+        }`}
+      >
+        {repo.isRegistered
+          ? "등록됨"
+          : registering === repo.id
+          ? "등록중..."
+          : "등록"}
+      </button>
+    </div>
+  );
+}
+
+function AccordionGroup({
+  owner,
+  repos,
+  registering,
+  onRegister,
+  defaultOpen = false,
+}: {
+  owner: string;
+  repos: GitHubRepo[];
+  registering: number | null;
+  onRegister: (repo: GitHubRepo) => void;
+  defaultOpen?: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  return (
+    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-4 py-3 flex justify-between items-center bg-gray-50 hover:bg-gray-100 transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          <span className="font-semibold text-gray-900">{owner}</span>
+          <span className="text-sm text-gray-500">({repos.length})</span>
+        </div>
+        <svg
+          className={`w-5 h-5 text-gray-500 transition-transform ${
+            isOpen ? "rotate-180" : ""
+          }`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </button>
+      {isOpen && (
+        <div className="divide-y">
+          {repos.map((repo) => (
+            <RepoItem
+              key={repo.id}
+              repo={repo}
+              registering={registering}
+              onRegister={onRegister}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function RegisterContent() {
   const router = useRouter();
   const [repos, setRepos] = useState<GitHubRepo[]>([]);
@@ -98,6 +204,19 @@ export function RegisterContent() {
       (repo.description?.toLowerCase().includes(search.toLowerCase()) ?? false)
   );
 
+  // 계정별로 그룹화
+  const groupedRepos = filteredRepos.reduce((acc, repo) => {
+    const owner = repo.fullName.split("/")[0];
+    if (!acc[owner]) {
+      acc[owner] = [];
+    }
+    acc[owner].push(repo);
+    return acc;
+  }, {} as Record<string, GitHubRepo[]>);
+
+  const owners = Object.keys(groupedRepos).sort();
+  const useAccordion = filteredRepos.length >= 10 && owners.length > 1;
+
   return (
     <div className="space-y-4">
       <div className="relative">
@@ -127,48 +246,28 @@ export function RegisterContent() {
         <div className="bg-white rounded-xl shadow-sm p-8 text-center">
           <p className="text-gray-500">검색 결과가 없습니다</p>
         </div>
+      ) : useAccordion ? (
+        <div className="space-y-3">
+          {owners.map((owner) => (
+            <AccordionGroup
+              key={owner}
+              owner={owner}
+              repos={groupedRepos[owner]}
+              registering={registering}
+              onRegister={registerRepo}
+            />
+          ))}
+        </div>
       ) : (
         <div className="bg-white rounded-xl shadow-sm divide-y">
           {filteredRepos.map((repo) => (
-            <div
+            <RepoItem
               key={repo.id}
-              className="p-4 flex justify-between items-center hover:bg-gray-50"
-            >
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-gray-900">
-                    {repo.fullName}
-                  </h3>
-                  {repo.private && (
-                    <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
-                      Private
-                    </span>
-                  )}
-                </div>
-                {repo.description && (
-                  <p className="text-sm text-gray-500 mt-1">
-                    {repo.description}
-                  </p>
-                )}
-              </div>
-              <button
-                onClick={() => registerRepo(repo)}
-                disabled={repo.isRegistered || registering === repo.id}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  repo.isRegistered
-                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    : registering === repo.id
-                    ? "bg-blue-400 text-white cursor-wait"
-                    : "bg-blue-600 text-white hover:bg-blue-700"
-                }`}
-              >
-                {repo.isRegistered
-                  ? "등록됨"
-                  : registering === repo.id
-                  ? "등록중..."
-                  : "등록"}
-              </button>
-            </div>
+              repo={repo}
+              registering={registering}
+              onRegister={registerRepo}
+              showFullName
+            />
           ))}
         </div>
       )}
