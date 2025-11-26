@@ -4,7 +4,7 @@ import { redirect, notFound } from "next/navigation";
 import { LoginButton } from "@/components/LoginButton";
 import { ExternalLinkIcon } from "@/components/ExternalLinkIcon";
 import Link from "next/link";
-import { OwnerView } from "../OwnerView";
+import { ConfigView } from "./ConfigView";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -59,7 +59,7 @@ export default async function RepositoryConfigPage({ params }: PageProps) {
             <h1 className="text-3xl font-bold text-gray-900">설정</h1>
           </div>
 
-          <OwnerView
+          <ConfigView
             repository={{
               id: repository.id,
               slug: repository.slug,

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ExternalLinkIcon } from "@/components/ExternalLinkIcon";
 
-interface OwnerViewProps {
+interface ConfigViewProps {
   repository: {
     id: string;
     slug: string;
@@ -14,7 +14,7 @@ interface OwnerViewProps {
   };
 }
 
-export function OwnerView({ repository }: OwnerViewProps) {
+export function ConfigView({ repository }: ConfigViewProps) {
   const router = useRouter();
   const [token, setToken] = useState("");
   const [saving, setSaving] = useState(false);

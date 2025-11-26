@@ -28,15 +28,9 @@ interface AllPRsViewProps {
   slug: string;
   repoFullName: string;
   hasToken: boolean;
-  isOwner: boolean;
 }
 
-export function AllPRsView({
-  slug,
-  repoFullName,
-  hasToken,
-  isOwner,
-}: AllPRsViewProps) {
+export function AllPRsView({ slug, repoFullName, hasToken }: AllPRsViewProps) {
   const [pullRequests, setPullRequests] = useState<PullRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,10 +44,7 @@ export function AllPRsView({
 
     async function fetchPRs() {
       try {
-        const url = isOwner
-          ? `/api/repositories/${slug}/pulls?all=true`
-          : `/api/repositories/${slug}/pulls`;
-        const res = await fetch(url);
+        const res = await fetch(`/api/repositories/${slug}/pulls?all=true`);
         if (!res.ok) {
           const data = await res.json();
           throw new Error(data.error || "Failed to fetch pull requests");
@@ -68,7 +59,7 @@ export function AllPRsView({
     }
 
     fetchPRs();
-  }, [slug, hasToken, isOwner]);
+  }, [slug, hasToken]);
 
   async function rerunWorkflow(runId: number) {
     setRerunning(runId);
@@ -97,16 +88,12 @@ export function AllPRsView({
         <p className="text-gray-500">
           이 레포지토리는 아직 설정이 완료되지 않았습니다.
         </p>
-        {isOwner ? (
-          <Link
-            href={`/r/${slug}/config`}
-            className="text-blue-600 hover:underline mt-2 inline-block"
-          >
-            설정 페이지에서 토큰을 등록하세요 →
-          </Link>
-        ) : (
-          <p className="text-gray-500">소유자에게 토큰 등록을 요청하세요.</p>
-        )}
+        <Link
+          href={`/r/${slug}/config`}
+          className="text-blue-600 hover:underline mt-2 inline-block"
+        >
+          설정 페이지에서 토큰을 등록하세요 →
+        </Link>
       </div>
     );
   }
@@ -131,9 +118,7 @@ export function AllPRsView({
     return (
       <div className="bg-white rounded-xl shadow-sm p-8 text-center">
         <p className="text-gray-500">
-          {isOwner
-            ? `현재 ${repoFullName}에서 실패한 Action이 있는 열린 PR이 없습니다.`
-            : `현재 ${repoFullName}에서 나에게 할당된 열린 PR이 없습니다.`}
+          현재 {repoFullName}에서 실패한 Action이 있는 열린 PR이 없습니다.
         </p>
       </div>
     );
@@ -142,9 +127,7 @@ export function AllPRsView({
   return (
     <div className="space-y-4">
       <p className="text-gray-600">
-        {isOwner
-          ? `${repoFullName}에서 실패한 Action이 있는 열린 PR 목록입니다.`
-          : `${repoFullName}에서 나에게 할당된 열린 PR 목록입니다.`}
+        {repoFullName}에서 실패한 Action이 있는 열린 PR 목록입니다.
       </p>
 
       {pullRequests.map((pr) => (
@@ -162,7 +145,7 @@ export function AllPRsView({
               <p className="text-sm text-gray-500 mt-1">
                 SHA: {pr.headSha.substring(0, 7)}
               </p>
-              {isOwner && pr.assignees && pr.assignees.length > 0 && (
+              {pr.assignees && pr.assignees.length > 0 && (
                 <div className="flex items-center gap-1 mt-2">
                   <span className="text-sm text-gray-500">담당자:</span>
                   {pr.assignees.map((assignee) => (

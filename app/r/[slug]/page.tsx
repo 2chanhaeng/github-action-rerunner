@@ -5,6 +5,7 @@ import { LoginButton } from "@/components/LoginButton";
 import { ExternalLinkIcon } from "@/components/ExternalLinkIcon";
 import Link from "next/link";
 import { AllPRsView } from "./AllPRsView";
+import { AssigneeView } from "./AssigneeView";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -68,12 +69,19 @@ export default async function RepositoryPage({ params }: PageProps) {
             )}
           </div>
 
-          <AllPRsView
-            slug={repository.slug}
-            repoFullName={repository.fullName}
-            hasToken={!!repository.token}
-            isOwner={isOwner}
-          />
+          {isOwner ? (
+            <AllPRsView
+              slug={repository.slug}
+              repoFullName={repository.fullName}
+              hasToken={!!repository.token}
+            />
+          ) : (
+            <AssigneeView
+              slug={repository.slug}
+              repoFullName={repository.fullName}
+              hasToken={!!repository.token}
+            />
+          )}
         </div>
       </div>
     </main>
