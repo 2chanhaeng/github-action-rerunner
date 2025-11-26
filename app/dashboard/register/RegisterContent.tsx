@@ -18,6 +18,7 @@ export function RegisterContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [registering, setRegistering] = useState<number | null>(null);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     async function fetchRepos() {
@@ -91,45 +92,86 @@ export function RegisterContent() {
     );
   }
 
+  const filteredRepos = repos.filter(
+    (repo) =>
+      repo.fullName.toLowerCase().includes(search.toLowerCase()) ||
+      (repo.description?.toLowerCase().includes(search.toLowerCase()) ?? false)
+  );
+
   return (
-    <div className="bg-white rounded-xl shadow-sm divide-y">
-      {repos.map((repo) => (
-        <div
-          key={repo.id}
-          className="p-4 flex justify-between items-center hover:bg-gray-50"
+    <div className="space-y-4">
+      <div className="relative">
+        <input
+          type="text"
+          placeholder="레포지토리 검색..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full px-4 py-3 pl-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+        <svg
+          className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
         >
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-gray-900">{repo.fullName}</h3>
-              {repo.private && (
-                <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
-                  Private
-                </span>
-              )}
-            </div>
-            {repo.description && (
-              <p className="text-sm text-gray-500 mt-1">{repo.description}</p>
-            )}
-          </div>
-          <button
-            onClick={() => registerRepo(repo)}
-            disabled={repo.isRegistered || registering === repo.id}
-            className={`px-4 py-2 rounded-lg transition-colors ${
-              repo.isRegistered
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : registering === repo.id
-                ? "bg-blue-400 text-white cursor-wait"
-                : "bg-blue-600 text-white hover:bg-blue-700"
-            }`}
-          >
-            {repo.isRegistered
-              ? "등록됨"
-              : registering === repo.id
-              ? "등록중..."
-              : "등록"}
-          </button>
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          />
+        </svg>
+      </div>
+
+      {filteredRepos.length === 0 ? (
+        <div className="bg-white rounded-xl shadow-sm p-8 text-center">
+          <p className="text-gray-500">검색 결과가 없습니다</p>
         </div>
-      ))}
+      ) : (
+        <div className="bg-white rounded-xl shadow-sm divide-y">
+          {filteredRepos.map((repo) => (
+            <div
+              key={repo.id}
+              className="p-4 flex justify-between items-center hover:bg-gray-50"
+            >
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-gray-900">
+                    {repo.fullName}
+                  </h3>
+                  {repo.private && (
+                    <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
+                      Private
+                    </span>
+                  )}
+                </div>
+                {repo.description && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    {repo.description}
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={() => registerRepo(repo)}
+                disabled={repo.isRegistered || registering === repo.id}
+                className={`px-4 py-2 rounded-lg transition-colors ${
+                  repo.isRegistered
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : registering === repo.id
+                    ? "bg-blue-400 text-white cursor-wait"
+                    : "bg-blue-600 text-white hover:bg-blue-700"
+                }`}
+              >
+                {repo.isRegistered
+                  ? "등록됨"
+                  : registering === repo.id
+                  ? "등록중..."
+                  : "등록"}
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
