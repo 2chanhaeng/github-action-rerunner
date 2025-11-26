@@ -16,7 +16,19 @@ export async function GET() {
     orderBy: { createdAt: "desc" },
   });
 
-  return NextResponse.json(repositories);
+  // 토큰 필드를 hasToken으로 변환하여 반환 (토큰 값 자체는 노출하지 않음)
+  const sanitizedRepositories = repositories.map((repo) => ({
+    id: repo.id,
+    slug: repo.slug,
+    name: repo.name,
+    fullName: repo.fullName,
+    githubId: repo.githubId,
+    hasToken: !!repo.token,
+    createdAt: repo.createdAt,
+    updatedAt: repo.updatedAt,
+  }));
+
+  return NextResponse.json(sanitizedRepositories);
 }
 
 // 새 레포지토리 등록
