@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ExternalLinkIcon } from "@/components/ExternalLinkIcon";
 
 interface GitHubRepo {
   id: number;
@@ -30,6 +31,7 @@ function RepoItem({
           <h3 className="font-semibold text-gray-900">
             {showFullName ? repo.fullName : repo.name}
           </h3>
+          <ExternalLinkIcon href={`https://github.com/${repo.fullName}`} />
           {repo.private && (
             <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
               Private

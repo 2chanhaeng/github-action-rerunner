@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { ExternalLinkIcon } from "@/components/ExternalLinkIcon";
 
 interface Repository {
   id: string;
@@ -107,9 +108,14 @@ export function DashboardContent() {
             className="bg-white rounded-xl shadow-sm p-6 flex justify-between items-center"
           >
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">
-                {repo.fullName}
-              </h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {repo.fullName}
+                </h3>
+                <ExternalLinkIcon
+                  href={`https://github.com/${repo.fullName}`}
+                />
+              </div>
               <p className="text-sm text-gray-500">
                 슬러그: {repo.slug}
                 {!repo.hasToken && (

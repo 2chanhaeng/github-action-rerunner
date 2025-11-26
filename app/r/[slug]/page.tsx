@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/prisma";
 import { redirect, notFound } from "next/navigation";
 import { LoginButton } from "@/components/LoginButton";
+import { ExternalLinkIcon } from "@/components/ExternalLinkIcon";
 import Link from "next/link";
 import { AllPRsView } from "./AllPRsView";
 
@@ -52,6 +53,10 @@ export default async function RepositoryPage({ params }: PageProps) {
               <h1 className="text-3xl font-bold text-gray-900">
                 {repository.fullName}
               </h1>
+              <ExternalLinkIcon
+                href={`https://github.com/${repository.fullName}`}
+                className="text-gray-500"
+              />
             </div>
             {isOwner && (
               <Link
