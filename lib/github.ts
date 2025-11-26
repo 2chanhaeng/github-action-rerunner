@@ -33,6 +33,22 @@ export async function getAssignedPullRequests(
   return data.filter((pr) => pr.assignees?.some((a) => a.login === assignee));
 }
 
+// 모든 Open PR 목록 조회
+export async function getAllOpenPullRequests(
+  token: string,
+  owner: string,
+  repo: string,
+) {
+  const octokit = createOctokit(token);
+  const { data } = await octokit.rest.pulls.list({
+    owner,
+    repo,
+    state: "open",
+  });
+
+  return data;
+}
+
 // PR의 Check Runs (GitHub Actions) 조회
 export async function getPullRequestCheckRuns(
   token: string,

@@ -3,13 +3,13 @@ import { prisma } from "@/prisma";
 import { redirect, notFound } from "next/navigation";
 import { LoginButton } from "@/components/LoginButton";
 import Link from "next/link";
-import { AllPRsView } from "./AllPRsView";
+import { OwnerView } from "../OwnerView";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-export default async function RepositoryPage({ params }: PageProps) {
+export default async function RepositoryConfigPage({ params }: PageProps) {
   const session = await auth();
   const { slug } = await params;
 
@@ -28,6 +28,11 @@ export default async function RepositoryPage({ params }: PageProps) {
 
   const isOwner = repository.ownerId === session.user.id;
 
+  // 소유자가 아니면 메인 페이지로 리다이렉트
+  if (!isOwner) {
+    redirect(`/r/${slug}`);
+  }
+
   return (
     <main className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
@@ -39,35 +44,24 @@ export default async function RepositoryPage({ params }: PageProps) {
         </header>
 
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-4">
-              {isOwner && (
-                <Link
-                  href="/dashboard"
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  ← 대시보드
-                </Link>
-              )}
-              <h1 className="text-3xl font-bold text-gray-900">
-                {repository.fullName}
-              </h1>
-            </div>
-            {isOwner && (
-              <Link
-                href={`/r/${slug}/config`}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                ⚙️ 설정
-              </Link>
-            )}
+          <div className="flex items-center gap-4 mb-6">
+            <Link
+              href={`/r/${slug}`}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              ← {repository.fullName}
+            </Link>
+            <h1 className="text-3xl font-bold text-gray-900">설정</h1>
           </div>
 
-          <AllPRsView
-            slug={repository.slug}
-            repoFullName={repository.fullName}
-            hasToken={!!repository.token}
-            isOwner={isOwner}
+          <OwnerView
+            repository={{
+              id: repository.id,
+              slug: repository.slug,
+              name: repository.name,
+              fullName: repository.fullName,
+              hasToken: !!repository.token,
+            }}
           />
         </div>
       </div>
