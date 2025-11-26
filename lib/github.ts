@@ -30,7 +30,7 @@ export async function getAssignedPullRequests(
   });
 
   // 담당자로 할당된 PR만 필터링
-  return data.filter((pr) => pr.assignees?.some((a) => a.login === assignee));
+  return data.filter((pr) => pr.user?.login === assignee);
 }
 
 // 모든 Open PR 목록 조회
